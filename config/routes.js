@@ -33,7 +33,10 @@ module.exports.routes = {
 
 
   // Custom routes here...
-
+  'POST /api/login': {
+    controller: 'AuthController',
+    action: 'login'
+  }
 
   // If a request to a URL doesn't match any of the custom routes above,
   // it is matched against Sails route blueprints.  See `config/blueprints.js`
