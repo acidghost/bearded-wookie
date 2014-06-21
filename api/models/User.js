@@ -5,7 +5,17 @@
  * @docs        :: http://sailsjs.org/#!documentation/models
  */
 
-var bcrypt = require('bcrypt');
+var bcrypt = require('bcrypt'),
+    shortid = require('shortid');
+
+var encryptPass = function(values, cb) {
+  // Encrypt password
+  bcrypt.hash(values.pass, 10, function(err, hash) {
+    if(err) return cb(err);
+    values.pass = hash;
+    cb();
+  });
+};
 
 module.exports = {
 
@@ -13,11 +23,16 @@ module.exports = {
     uuid: {
       type: 'string',
       primaryKey: true,
-      //required: true,
-      unique: true
+      required: true,
+      unique: true,
+      defaultsTo: shortid.generate
     },
     pass: {
       type: 'string'
+    },
+    conversations: {
+      collection: 'Conversation',
+      via: 'users'
     },
 
     toJSON: function() {
@@ -27,15 +42,17 @@ module.exports = {
     }
   },
 
+  beforeCreate: function(values, cb) {
+    if(values.pass && values.pass != '') {
+      encryptPass(values, cb);
+    } else {
+      cb();
+    }
+  },
+
   beforeUpdate: function(values, cb) {
     if(values.pass) {
-      // Encrypt password
-      var p = values.pass;
-      bcrypt.hash(values.pass, 10, function(err, hash) {
-        if(err) return cb(err);
-        values.pass = hash;
-        cb();
-      });
+      encryptPass(values, cb);
     } else {
       cb();
     }

@@ -5,8 +5,6 @@
  * @help        :: See http://links.sailsjs.org/docs/controllers
  */
 
-var shortid = require('shortid');
-
 module.exports = {
 
   find: function(req, res) {
@@ -28,7 +26,7 @@ module.exports = {
   },
 
   create: function(req, res) {
-    User.create({ uuid: shortid.generate(), pass: '' }).exec(function(err, user) {
+    User.create({ pass: req.param('pass') || '' }).exec(function(err, user) {
       if(err) {
         ErrorResolver(err, res);
       } else {
