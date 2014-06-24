@@ -8,6 +8,13 @@
 module.exports = {
 
   attributes: {
+    uuid: {
+      type: 'string',
+      primaryKey: true,
+      required: true,
+      unique: true,
+      defaultsTo: sails.config.globals.shortid.generate
+    },
     writer: {
       model: 'User',
       required: true

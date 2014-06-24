@@ -26,7 +26,7 @@ module.exports = {
   },
 
   create: function(req, res) {
-    User.create({ pass: req.param('pass') || '' }).exec(function(err, user) {
+    User.create({ pass: req.param('pass') }).exec(function(err, user) {
       if(err) {
         ErrorResolver(err, res);
       } else {
@@ -37,7 +37,7 @@ module.exports = {
 
   update: function(req, res) {
     var params = req.allParams();
-    User.update({ uuid: params.id, pass: '' }, { pass: params.pass }).exec(function(err, user) {
+    User.update({ uuid: params.id }, { pass: params.pass }).exec(function(err, user) {
       if(err) {
         ErrorResolver(err, res);
       } else {

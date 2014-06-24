@@ -5,15 +5,15 @@
 * @docs        :: http://sailsjs.org/#!documentation/models
 */
 
-var shortid= require('shortid');
-
 module.exports = {
 
   attributes: {
     uuid: {
       type: 'string',
+      required: true,
       unique: true,
-      primaryKey: true
+      primaryKey: true,
+      defaultsTo: sails.config.globals.shortid.generate
     },
     users: {
       collection: 'User',
@@ -23,11 +23,6 @@ module.exports = {
       collection: 'Message',
       via: 'conversation'
     }
-  },
-
-  beforeCreate: function(values, cb) {
-    values.uuid = shortid.generate();
-    cb();
   }
 };
 

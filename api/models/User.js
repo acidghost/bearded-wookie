@@ -5,8 +5,7 @@
  * @docs        :: http://sailsjs.org/#!documentation/models
  */
 
-var bcrypt = require('bcrypt'),
-    shortid = require('shortid');
+var bcrypt = require('bcrypt');
 
 var encryptPass = function(values, cb) {
   // Encrypt password
@@ -25,10 +24,11 @@ module.exports = {
       primaryKey: true,
       required: true,
       unique: true,
-      defaultsTo: shortid.generate
+      defaultsTo: sails.config.globals.shortid.generate
     },
     pass: {
-      type: 'string'
+      type: 'string',
+      required: true
     },
     conversations: {
       collection: 'Conversation',
@@ -43,11 +43,7 @@ module.exports = {
   },
 
   beforeCreate: function(values, cb) {
-    if(values.pass && values.pass != '') {
-      encryptPass(values, cb);
-    } else {
-      cb();
-    }
+    encryptPass(values, cb);
   },
 
   beforeUpdate: function(values, cb) {
