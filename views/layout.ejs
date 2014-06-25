@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html ng-app="beardedWookie">
   <head>
     <title>New Sails App</title>
 
@@ -34,6 +34,28 @@
   </head>
 
   <body>
+
+      <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+          <div class="container">
+              <div class="navbar-header">
+                  <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#main-nav">
+                      <span class="sr-only">Toggle navigation</span>
+                      <span class="icon-bar"></span>
+                      <span class="icon-bar"></span>
+                      <span class="icon-bar"></span>
+                  </button>
+                  <a class="navbar-brand" href="#">
+                      <h1 class="sr-only">Bearded Wookie</h1>
+                      <img src="images/wookie_sm.gif" />
+                      <span>Bearded Wookie!</span>
+                  </a>
+              </div>
+
+              <!-- Collect the nav links, forms, and other content for toggling -->
+              <div ng-controller="NavCtrl" ng-include="getView()" class="collapse navbar-collapse" id="main-nav"></div>
+          </div>
+      </nav>
+
     <%- body %>
 
 
@@ -60,7 +82,7 @@
     -->
 
     <!--TEMPLATES-->
-    
+    <script type="text/javascript" src="/jst.js"></script>
     <!--TEMPLATES END-->
 
 
@@ -90,11 +112,18 @@
     <!--SCRIPTS-->
     <script src="/js/dependencies/jquery.js"></script>
     <script src="/js/dependencies/angular.js"></script>
-    <script src="/js/dependencies/ui-bootstrap.js"></script>
+    <script src="/js/dependencies/angular-bootstrap.js"></script>
     <script src="/js/dependencies/angular-resource.js"></script>
     <script src="/js/dependencies/angular-route.js"></script>
     <script src="/js/dependencies/bootstrap.js"></script>
     <script src="/js/dependencies/sails.io.js"></script>
+    <script src="/js/app.js"></script>
+    <script src="/js/controllers/home.js"></script>
+    <script src="/js/controllers/login.js"></script>
+    <script src="/js/controllers/nav.js"></script>
+    <script src="/js/controllers/signup.js"></script>
+    <script src="/js/directives/match.js"></script>
+    <script src="/js/services/user.js"></script>
     <!--SCRIPTS END-->
   </body>
 </html>
