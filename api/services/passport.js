@@ -3,6 +3,9 @@
  */
 var passport = require('passport'),
     LocalStrategy = require('passport-local').Strategy,
+    passHTTP = require('passport-http'),
+    DigestStrategy = passHTTP.DigestStrategy,
+    BasicStrategy = passHTTP.BasicStrategy,
     bcrypt = require('bcrypt');
 
 passport.serializeUser(function(user, done) {
@@ -30,28 +33,66 @@ passport.use(
     },
     function(uname, password, done) {
       process.nextTick(function() {
-        User.findOne(uname).exec(function(err, user) {
-          if(err) {
-            sails.log.error(err);
-            return done(err);
-          }
-
-          if(user == null || user == 'undefined') {
-            return done(null, false, { message: 'Unknown user: '+uname });
-          }
-
-          bcrypt.compare(password, user.pass, function(err, match) {
-            if(err) {
-              sails.log.error(err);
-              return done(err);
-            }
-            if(!match) {
-              return done(null, false, { message: 'Invalid password' });
-            }
-            return done(null, user);
-          });
-        });
+        userPassAuth(user, pass, done);
       });
     }
   )
 );
+
+// Digest Strategy
+passport.use(new DigestStrategy({ qop: 'auth' },
+  function(ID, done) {
+    User.findOne({ uuid: ID }).exec(function (err, user) {
+      sails.log(err, user);
+      if (err) { return done(err); }
+      if (!user) { return done(null, false); }
+      return done(null, user, user.pass);
+    });
+  },
+  function(params, done) {
+    // validate nonces as necessary
+    done(null, true)
+  }
+));
+
+// Use the BasicStrategy within Passport.
+//   Strategies in Passport require a `verify` function, which accept
+//   credentials (in this case, a username and password), and invoke a callback
+//   with a user object.
+passport.use(new BasicStrategy({
+  },
+  function(username, password, done) {
+    // asynchronous verification, for effect...
+    process.nextTick(function () {
+
+      // Find the user by username.  If there is no user with the given
+      // username, or the password is not correct, set the user to `false` to
+      // indicate failure.  Otherwise, return the authenticated `user`.
+      userPassAuth(username, password, done);
+    });
+  }
+));
+
+var userPassAuth = function(uname, password, done) {
+  User.findOne(uname).exec(function(err, user) {
+    if(err) {
+      sails.log.error(err);
+      return done(err);
+    }
+
+    if(user == null || user == 'undefined') {
+      return done(null, false, { message: 'Unknown user: '+uname });
+    }
+
+    bcrypt.compare(password, user.pass, function(err, match) {
+      if(err) {
+        sails.log.error(err);
+        return done(err);
+      }
+      if(!match) {
+        return done(null, false, { message: 'Invalid password' });
+      }
+      return done(null, user);
+    });
+  });
+};
