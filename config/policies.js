@@ -21,7 +21,8 @@ module.exports.policies = {
   '*': 'basicAuth',
   'AuthController': true,
   'UserController': {
-    'create': true
+    'create': true,
+    'findOne': ['basicAuth', 'checkUser']
   }
 
 	// Here's an example of mapping some policies to run before

@@ -4,21 +4,24 @@
 
 var app = angular.module('beardedWookie');
 
-app.controller('NavCtrl', function($scope, $modal) {
+app.controller('NavCtrl', ['$scope', '$modal', '$location', 'Auth', function($scope, $modal, $location, Auth) {
+
+  $scope.logged = false;
+  $scope.uuid = Auth.loggedUser;
 
   $scope.getView = function() {
-    return 'templates/nav/default.html';
+    if($scope.logged) {
+      return 'templates/nav/logged.html';
+    } else {
+      return 'templates/nav/default.html';
+    }
   };
 
   $scope.openSignup = function() {
-    var modalInstance = $modal.open({
+    $modal.open({
       templateUrl: 'templates/modals/signup-modal.html',
       controller: 'SignupCtrl',
       size: 'sm'
-    });
-
-    modalInstance.result.then(function (selectedItem) {
-      $scope.selected = selectedItem;
     });
   };
 
@@ -29,9 +32,10 @@ app.controller('NavCtrl', function($scope, $modal) {
       size: 'sm'
     });
 
-    modalInstance.result.then(function (selectedItem) {
-      $scope.selected = selectedItem;
+    modalInstance.result.then(function (loggedIn) {
+      $scope.logged = loggedIn;
+      $location.path('/conversations');
     });
   };
 
-});
+}]);
