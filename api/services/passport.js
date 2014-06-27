@@ -74,7 +74,7 @@ passport.use(new BasicStrategy({
 ));
 
 var userPassAuth = function(uname, password, done) {
-  User.findOne(uname).exec(function(err, user) {
+  User.findOne({ uuid: uname }).populate('conversations').exec(function(err, user) {
     if(err) {
       sails.log.error(err);
       return done(err);

@@ -21,10 +21,10 @@ module.exports = {
   attributes: {
     uuid: {
       type: 'string',
-      primaryKey: true,
+      index: true,
       required: true,
       unique: true,
-      defaultsTo: sails.config.globals.shortid.generate
+      defaultsTo: sails.config.models.defaultUUID
     },
     pass: {
       type: 'string',
@@ -32,11 +32,13 @@ module.exports = {
     },
     conversations: {
       collection: 'Conversation',
-      via: 'users'
+      via: 'users',
+      dominant: true
     },
 
     toJSON: function() {
       var obj = this.toObject();
+      delete obj.id;
       delete obj.pass;
       return obj;
     }
@@ -44,6 +46,10 @@ module.exports = {
 
   beforeCreate: function(values, cb) {
     encryptPass(values, cb);
+  },
+
+  afterCreate: function(newRecord, cb) {
+    generateUUID(newRecord, cb, 'user');
   },
 
   beforeUpdate: function(values, cb) {

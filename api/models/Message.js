@@ -10,10 +10,10 @@ module.exports = {
   attributes: {
     uuid: {
       type: 'string',
-      primaryKey: true,
+      index: true,
       required: true,
       unique: true,
-      defaultsTo: sails.config.globals.shortid.generate
+      defaultsTo: sails.config.models.defaultUUID
     },
     writer: {
       model: 'User',
@@ -26,7 +26,17 @@ module.exports = {
     text: {
       type: 'string',
       required: true
+    },
+
+    toJSON: function() {
+      var obj = this.toObject();
+      delete obj.id;
+      return obj;
     }
+  },
+
+  afterCreate: function(newRecord, cb) {
+    generateUUID(newRecord, cb, 'message');
   }
 };
 

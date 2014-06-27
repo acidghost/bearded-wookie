@@ -12,7 +12,7 @@ module.exports = {
   },
 
   findOne: function(req, res) {
-    User.findOne(req.param('id')).exec(function(err, user) {
+    User.findOne({ uuid: req.param('id') }).populate('conversations').exec(function(err, user) {
       if(err) {
         ErrorResolver(err, res);
       } else {
@@ -37,7 +37,7 @@ module.exports = {
 
   update: function(req, res) {
     var params = req.allParams();
-    User.update({ uuid: params.id }, { pass: params.pass }).exec(function(err, user) {
+    User.update({ uuid: params.id }, { pass: params.pass }).populate('conversations').exec(function(err, user) {
       if(err) {
         ErrorResolver(err, res);
       } else {
