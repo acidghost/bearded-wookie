@@ -1,0 +1,21 @@
+<div class="modal-header">
+  <div class="close" ng-click="cancel()">&times;</div>
+  <h3 class="modal-title">Remove users</h3>
+</div>
+<div class="modal-body">
+  <div ng-show="alerts.length">
+    <alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)">{{alert.msg}}</alert>
+  </div>
+  <div>
+    <p>Select which users you want to remove from conversation</p>
+    <hr />
+    <div ng-repeat="u in actualUsers" class="row" ng-hide="user.uuid == u.uuid">
+      <div class="col-xs-8">{{u.uuid}}</div>
+      <div class="col-xs-4">
+        <button ng-click="removeUser(u.uuid, $index)" class="btn btn-danger btn-xs pull-right">
+          <span class="glyphicon glyphicon-trash"></span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

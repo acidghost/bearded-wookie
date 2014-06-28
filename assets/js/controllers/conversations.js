@@ -23,8 +23,8 @@ app.controller('ConversationsCtrl', ['$scope', 'conv', 'Conversation', function(
     );
   };
 
-  $scope.$on('usersAddedToConversation', function(event, users) {
-    $scope.conversation.users = $scope.conversation.users.concat(users);
+  $scope.$on('usersChangedInConversation', function(event, users) {
+    $scope.conversation.users = users;
   });
 
 }]);
