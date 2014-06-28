@@ -4,10 +4,10 @@
 
 var app = angular.module('beardedWookie');
 
-app.controller('HomeCtrl', function($scope) {
+app.controller('HomeCtrl',['$scope', function($scope) {
 
   $scope.awe = [
     'one','two','tree'
   ];
 
-});
+}]);

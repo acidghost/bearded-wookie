@@ -4,7 +4,7 @@
 
 var app = angular.module('beardedWookie');
 
-app.factory('User', function($resource) {
+app.factory('User', ['$resource', function($resource) {
 
   return $resource('/api/user/:id', null, {
     'get': { method: 'GET' },
@@ -13,4 +13,4 @@ app.factory('User', function($resource) {
     'destroy': { method: 'DELETE' }
   });
 
-});
+}]);

@@ -4,7 +4,7 @@
 
 var app = angular.module('beardedWookie', ['ngRoute', 'ngResource', 'ui.bootstrap']);
 
-app.config(function ($routeProvider, $locationProvider) {
+app.config(['$routeProvider', '$locationProvider', function ($routeProvider, $locationProvider) {
   $routeProvider
     .when('/', {
       templateUrl: 'templates/home.html',
@@ -24,9 +24,9 @@ app.config(function ($routeProvider, $locationProvider) {
       templateUrl: 'templates/conversations.html',
       controller: 'ConversationsCtrl',
       resolve: {
-        conv: function($route, Conversation) {
+        conv: ['$route', 'Conversation', function($route, Conversation) {
           return Conversation.get({ id: $route.current.params.id });
-        }
+        }]
       }
     })
     .otherwise({
@@ -35,7 +35,7 @@ app.config(function ($routeProvider, $locationProvider) {
 
   // use the HTML5 History API
   // $locationProvider.html5Mode(true);
-});
+}]);
 
 app.run(['$rootScope', '$location', 'Auth', function($rootScope, $location, Auth){
 
