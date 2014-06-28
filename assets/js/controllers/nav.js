@@ -4,10 +4,16 @@
 
 var app = angular.module('beardedWookie');
 
-app.controller('NavCtrl', ['$scope', '$modal', '$location', 'Auth', function($scope, $modal, $location, Auth) {
+app.controller('NavCtrl', ['$scope', '$rootScope', '$modal', '$location', 'Auth', function($scope, $rootScope, $modal, $location, Auth) {
 
+  $scope.user = $rootScope.loggedUser();
   $scope.logged = false;
-  $scope.uuid = Auth.loggedUser;
+
+  $scope.checkUser = function() {
+    var loggedUser = $rootScope.loggedUser();
+    $scope.logged = !!loggedUser;
+    $scope.user = loggedUser;
+  };
 
   $scope.getView = function() {
     if($scope.logged) {
@@ -15,6 +21,16 @@ app.controller('NavCtrl', ['$scope', '$modal', '$location', 'Auth', function($sc
     } else {
       return 'templates/nav/default.html';
     }
+  };
+
+  $scope.nav = function(where) {
+    $location.path(where);
+  };
+
+  $scope.logout = function() {
+    Auth.clearCredentials();
+    $scope.checkUser();
+    $location.path('/');
   };
 
   $scope.openSignup = function() {
@@ -33,8 +49,10 @@ app.controller('NavCtrl', ['$scope', '$modal', '$location', 'Auth', function($sc
     });
 
     modalInstance.result.then(function (loggedIn) {
-      $scope.logged = loggedIn;
-      $location.path('/conversations');
+      if(loggedIn) {
+        $scope.checkUser();
+        $location.path('/conversations');
+      }
     });
   };
 

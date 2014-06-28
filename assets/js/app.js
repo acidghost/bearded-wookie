@@ -4,20 +4,30 @@
 
 var app = angular.module('beardedWookie', ['ngRoute', 'ngResource', 'ui.bootstrap']);
 
-var accessControl = {
-  '/': true,
-  '/conversations': false
-};
-
 app.config(function ($routeProvider, $locationProvider) {
   $routeProvider
     .when('/', {
       templateUrl: 'templates/home.html',
-      controller: 'HomeCtrl'
+      controller: 'HomeCtrl',
+      publicAccess: true
     })
     .when('/conversations', {
       templateUrl: 'templates/conversations.html',
-      controller: 'ConversationsCtrl'
+      controller: 'ConversationsCtrl',
+      resolve: {
+        conv: function() {
+          return null;
+        }
+      }
+    })
+    .when('/conversations/:id', {
+      templateUrl: 'templates/conversations.html',
+      controller: 'ConversationsCtrl',
+      resolve: {
+        conv: function($route, Conversation) {
+          return Conversation.get({ id: $route.current.params.id });
+        }
+      }
     })
     .otherwise({
       redirectTo: '/'
@@ -27,17 +37,17 @@ app.config(function ($routeProvider, $locationProvider) {
   // $locationProvider.html5Mode(true);
 });
 
-app.run(function($rootScope, $window, Auth){
+app.run(['$rootScope', '$location', 'Auth', function($rootScope, $location, Auth){
 
-  $rootScope.$on("$locationChangeStart", function(event, next, current) {
-    for(var route in accessControl) {
-      if(next.indexOf(route) !== -1) {
-        if(accessControl[route] === false && Auth.loggedUser() === undefined) {
-          event.preventDefault();
-          $window.location.href = '#/';
-        }
-      }
+  $rootScope.loggedUser = Auth.loggedUser;
+  $rootScope.setUser = Auth.setUser;
+
+  $rootScope.$on("$routeChangeStart", function(event, next, current) {
+    var publicAccess = next.publicAccess || false;
+    if(!publicAccess && Auth.loggedUser() == undefined) {
+      event.preventDefault();
+      $location.path('/').replace();
     }
   });
 
-});
+}]);

@@ -22,6 +22,7 @@ app.controller('LoginCtrl', ['$scope', '$modalInstance', 'Auth', 'User', functio
     User.get({ id: user.uuid },
       function(user) {
         $scope.addAlert('success', 'Successfully logged in!');
+        Auth.setUser(user);
         $scope.hideForm = true;
       },
       function(err) {

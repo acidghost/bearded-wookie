@@ -1,1 +1,28 @@
-<h1>conversations</h1>
+<div class="row">
+  <div class="col-xs-6 text-left">
+    <button class="btn btn-sm btn-primary hidden-md hidden-lg" ng-click="isListCollapsed = !isListCollapsed">
+      <span class="glyphicon glyphicon-th-list"></span> Toggle conversations list
+    </button>
+  </div>
+  <div class="col-xs-6 text-right">
+    <button class="btn btn-sm btn-success" ng-click="createConversation()">
+      <span class="glyphicon glyphicon-plus"></span>
+      <span class="glyphicon glyphicon-comment"></span>
+    </button>
+  </div>
+</div>
+<div class="row">
+  <div id="conversations-list" collapse="isListCollapsed" class="col-xs-6 col-md-4 col-lg-3">
+    <h5><span class="glyphicon glyphicon-comment"></span> Conversations list</h5>
+    <div class="list-group">
+      <a class="list-group-item list-group-item-success"
+         ng-repeat="c in user.conversations track by $index"
+         ng-class="{active: c.uuid == conversation.uuid}"
+         ng-href="#/conversations/{{c.uuid}}">
+        {{c.uuid}}
+        <span class="badge">{{c.messages.length}}</span>
+      </a>
+    </div>
+  </div>
+  <div id="conversation-container" class="col-xs-12 col-md-8 col-lg-9" ng-controller="SingleConversationCtrl" ng-include="getView()"></div>
+</div>
