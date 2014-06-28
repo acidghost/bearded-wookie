@@ -16,7 +16,8 @@ app.factory('Conversation', ['$resource', function($resource) {
       'create': { method: 'POST', params: { entity: '', uid: '' } },
       'get': { method: 'GET', params: { entity: '', uid: '' } },
       'getAll': { method: 'GET', isArray: true, params: { uid: '' } },
-      'destroy': { method: 'DELETE' }
+      'destroy': { method: 'DELETE' },
+      'addUser': { method: 'POST', params: { entity: 'users', uid: '' } }
     }
   );
 
