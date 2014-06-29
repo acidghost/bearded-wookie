@@ -29,7 +29,8 @@
     "passport-local": "^1.0.0",
     "rc": "~0.3.3",
     "sails": "~0.10.0-rc8",
-    "sails-disk": "~0.10.0"
+    "sails-disk": "~0.10.0",
+    "sails-mongo": "^0.9.8"
   },
   "scripts": {
     "start": "node app.js",
