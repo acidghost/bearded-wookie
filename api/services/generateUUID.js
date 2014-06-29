@@ -5,7 +5,11 @@
 module.exports = function(newRecord, cb, model) {
 
   if(newRecord.uuid === sails.config.models.defaultUUID) {
-    newRecord.uuid = sails.config.globals.hashids.encrypt(newRecord.id);
+    // Get a timestamp in seconds
+    var timestamp = Math.floor(new Date().getTime()/1000);
+    // Create a date with the timestamp
+    var timestampDate = new Date(timestamp*1000).getTime();
+    newRecord.uuid = sails.config.globals.hashids.encrypt(timestampDate);
     sails.models[model].update(newRecord.id, {uuid: newRecord.uuid}).exec(function(e, u) {
       if(e) {
         sails.log.error(model + ' afterCreate: ', e);

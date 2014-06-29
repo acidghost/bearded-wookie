@@ -29,8 +29,8 @@
     <div class="row">
       <div class="col-xs-12 col-sm-6">
         <div id="conversation-details">
-          <div><b>Created at:</b> <time>{{conversation.createdAt | date}}</time></div>
-          <div><b>Updated at:</b> <time>{{conversation.updatedAt | date}}</time></div>
+          <div><b>Created at:</b> <time><small>{{conversation.createdAt | date:'MM/dd/yyyy @ h:mma'}}</small></time></div>
+          <div><b>Updated at:</b> <time><small>{{conversation.updatedAt | date:'MM/dd/yyyy @ h:mma'}}</small></time></div>
         </div>
       </div>
       <div class="col-xs-12 col-sm-6">
