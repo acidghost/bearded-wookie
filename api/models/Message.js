@@ -7,6 +7,8 @@
 
 module.exports = {
 
+  autoUpdatedAt: false,
+
   attributes: {
     uuid: {
       type: 'string',
@@ -31,6 +33,7 @@ module.exports = {
     toJSON: function() {
       var obj = this.toObject();
       delete obj.id;
+      delete obj.conversation;
       return obj;
     }
   },

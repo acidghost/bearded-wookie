@@ -25,23 +25,57 @@ module.exports = {
     });
   },
 
-  findOne: function(req, res) {
-    Conversation
-      .findOne({ uuid: req.param('id') })
-      .populate('users')
-      .populate('messages')
-      .exec(function(err, conv) {
+  find: function(req, res) {
+    User
+      .findOne({ uuid: req.user.uuid })
+      .populate('conversations')
+      .exec(function(err, user) {
         if(err) {
-          sails.log.error(err);
           ErrorResolver(err, res);
         } else {
-          if(conv) {
-            res.ok(conv);
+          if(user) {
+            sails.log.debug('Returning conversations list to user', user.uuid);
+            res.ok(user.conversations);
           } else {
-            res.notFound();
+            res.forbidden();
           }
         }
       });
+  },
+
+  findOne: function(req, res) {
+    async.auto({
+      conversation: function(cb) {
+        Conversation
+          .findOne({ uuid: req.param('id') })
+          .populate('users')
+          .populate('messages')
+          .exec(cb);
+      },
+      writers: ['conversation', function(cb, results) {
+        User.find({ id: _.pluck(results.conversation.messages, 'writer') }).exec(cb);
+      }],
+      map: ['writers', function(cb, results) {
+        var writers = _.indexBy(results.writers, 'id');
+        var conversation = results.conversation;
+        conversation.messages = conversation.messages.map(function(msg) {
+          msg.writer = writers[msg.writer].toJSON();
+          return msg;
+        });
+        return cb(null, conversation);
+      }]
+    }, function(err, results) {
+      sails.log('map', results.map);
+      if(err) {
+        ErrorResolver(err, res);
+      } else {
+        if(results.map) {
+          return res.json(results.map);
+        } else {
+          return res.notFound();
+        }
+      }
+    });
   },
 
   populate: function(req, res) {
@@ -71,27 +105,67 @@ module.exports = {
 
   add: function(req, res) {
     var params = req.allParams();
+    var relation = req.options.alias;
+    if (!relation) {
+      return res.serverError(new Error('Missing required route option, `req.options.alias`.'));
+    }
+    // Get the model class of the child in order to figure out the name of
+    // the primary key attribute.
+    var associationAttr = _.findWhere(Conversation.associations, { alias: relation });
+    var ChildModel = sails.models[associationAttr.collection];
+    if(ChildModel == undefined) {
+      return res.badRequest();
+    }
+
+    // `params.uuid` is used for adding users
+    // `req.user.uuid` is the auth user for message creation
+    var userID = params.uuid || req.user.uuid;
+
     Conversation.findOne({ uuid: params.parentid }).exec(function(err, conversation) {
       if(err) {
         ErrorResolver(err, res);
       } else {
         if(conversation) {
-          User.findOne({ uuid: params.uuid }).populate('conversations').exec(function(err, user) {
+          var query = User.findOne({ uuid: userID });
+          if(relation === 'users') {
+            query.populate('conversations');
+          }
+          query.exec(function(err, user) {
             if(err) {
               ErrorResolver(err, res);
             } else {
               if(user) {
-                for(var i=0; i<user.conversations.length; i++) {
-                  if(user.conversations[i].uuid === conversation.uuid) {
-                    return res.badRequest({ error: 'The user is already into the conversation' });
+                var entityID = null;
+                if(relation === 'users') {
+                  for(var i=0; i<user.conversations.length; i++) {
+                    if(user.conversations[i].uuid === conversation.uuid) {
+                      return res.badRequest({ error: 'The user is already into the conversation' });
+                    }
                   }
+                  entityID = user.uuid;
+                  conversation.users.add(user.id);
+                } else if(relation === 'messages') {
+                  Message.create(
+                    {
+                      conversation: conversation.id,
+                      writer: user.id,
+                      text: params.text
+                    }
+                  ).exec(function(err, message) {
+                      if(err) {
+                        return ErrorResolver(err, res);
+                      } else {
+                        sails.log.debug('Created new message:', JSON.stringify(message));
+                        entityID = message.uuid;
+                        conversation.messages.add(message.id);
+                      }
+                    });
                 }
-                conversation.users.add(user.id);
                 conversation.save(function(err, c) {
                   if(err) {
                     ErrorResolver(err, res);
                   } else {
-                    sails.log.debug('Added user', user.uuid, 'to conversation', conversation.uuid);
+                    sails.log.debug('Added', relation, entityID, 'to conversation', conversation.uuid);
                     res.ok(c);
                   }
                 });
