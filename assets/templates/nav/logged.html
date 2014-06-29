@@ -1,8 +1,11 @@
 <ul class="nav navbar-nav navbar-right">
   <li>
     <div class="btn-group" dropdown>
-      <button type="button" class="btn btn-primary dropdown-toggle navbar-btn">
-        <span class="glyphicon glyphicon-user"></span> {{user.uuid}} <span class="caret"></span>
+      <button id="user-menu" type="button" class="btn btn-primary dropdown-toggle navbar-btn">
+        <div class="user-image" style="background-image: url('http://robohash.org/{{user.uuid}}')"></div>
+        <div class="btn-content">
+          {{user.uuid}} <span class="caret"></span>
+        </div>
       </button>
       <ul class="dropdown-menu" role="menu">
         <li><a href="" ng-click="nav('/conversations')"><span class="glyphicon glyphicon-inbox"></span> Conversations</a></li>

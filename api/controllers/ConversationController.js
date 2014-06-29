@@ -5,6 +5,40 @@
  * @help        :: See http://links.sailsjs.org/docs/controllers
  */
 
+var findOne = function findOne(req, res) {
+  async.auto({
+    conversation: function(cb) {
+      Conversation
+        .findOne({ uuid: req.param('id') || req.param('parentid') })
+        .populate('users')
+        .populate('messages')
+        .exec(cb);
+    },
+    writers: ['conversation', function(cb, results) {
+      User.find({ id: _.pluck(results.conversation.messages, 'writer') }).exec(cb);
+    }],
+    map: ['writers', function(cb, results) {
+      var writers = _.indexBy(results.writers, 'id');
+      var conversation = results.conversation;
+      conversation.messages = conversation.messages.map(function(msg) {
+        msg.writer = writers[msg.writer].toJSON();
+        return msg;
+      });
+      return cb(null, conversation);
+    }]
+  }, function(err, results) {
+    if(err) {
+      ErrorResolver(err, res);
+    } else {
+      if(results.map) {
+        return res.json(results.map);
+      } else {
+        return res.notFound();
+      }
+    }
+  });
+};
+
 module.exports = {
 
   create: function(req, res) {
@@ -43,40 +77,7 @@ module.exports = {
       });
   },
 
-  findOne: function(req, res) {
-    async.auto({
-      conversation: function(cb) {
-        Conversation
-          .findOne({ uuid: req.param('id') })
-          .populate('users')
-          .populate('messages')
-          .exec(cb);
-      },
-      writers: ['conversation', function(cb, results) {
-        User.find({ id: _.pluck(results.conversation.messages, 'writer') }).exec(cb);
-      }],
-      map: ['writers', function(cb, results) {
-        var writers = _.indexBy(results.writers, 'id');
-        var conversation = results.conversation;
-        conversation.messages = conversation.messages.map(function(msg) {
-          msg.writer = writers[msg.writer].toJSON();
-          return msg;
-        });
-        return cb(null, conversation);
-      }]
-    }, function(err, results) {
-      sails.log('map', results.map);
-      if(err) {
-        ErrorResolver(err, res);
-      } else {
-        if(results.map) {
-          return res.json(results.map);
-        } else {
-          return res.notFound();
-        }
-      }
-    });
-  },
+  findOne: findOne,
 
   populate: function(req, res) {
     var relation = req.options.alias;
@@ -166,7 +167,8 @@ module.exports = {
                     ErrorResolver(err, res);
                   } else {
                     sails.log.debug('Added', relation, entityID, 'to conversation', conversation.uuid);
-                    res.ok(c);
+                    //res.ok(c);
+                    findOne(req, res);
                   }
                 });
               } else {

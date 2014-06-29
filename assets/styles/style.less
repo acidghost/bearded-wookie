@@ -54,6 +54,49 @@ body {
       margin-bottom: 20px;
       height: 300px;
       overflow-y: scroll;
+      overflow-x: hidden;
+      word-break: break-word;
+      & > ul {
+        li {
+          clear: both;
+          min-width: 100%;
+          border-bottom: 1px solid #ccc;
+          padding-top: 10px;
+          &.message-mine {
+            text-align: right;
+            .conversation-user-img { .pull-right; }
+            strong {
+              .pull-right;
+              margin-left: 3px;
+            }
+            small {
+              position: absolute;
+              left: 0px;
+            }
+          }
+          &.message-other {
+            text-align: left;
+            .conversation-user-img { .pull-left; }
+            small {
+              .pull-right;
+            }
+          }
+          .message-head {
+            min-height: 20px;
+            position: relative;
+          }
+          .conversation-user-img {
+            width: 40px;
+            height: 40px;
+            border: 2px solid @gray-light;
+            background-size: 120%;
+            background-position: 50% 50%;
+            .img-circle;
+            margin: 0px 6px 3px 6px;
+            clear: both;
+          }
+        }
+      }
     }
     #conversation-input {
       textarea {
@@ -75,6 +118,24 @@ body {
     }
   }
 
+}
+
+#user-menu {
+  padding: 4px 8px;
+  .user-image {
+    width: 30px;
+    height: 30px;
+    background-size: 110%;
+    background-position: 50% 50%;
+    float: left;
+    background-color: white;
+    margin-right: 5px;
+    .img-circle;
+  }
+  .btn-content {
+    padding-top: 5px;
+    float: left;
+  }
 }
 
 @media (max-width: @screen-md-min) {

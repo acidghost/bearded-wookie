@@ -4,7 +4,9 @@
 
 var app = angular.module('beardedWookie');
 
-app.controller('SingleConversationCtrl', ['$scope', '$modal', function($scope, $modal) {
+app.controller('SingleConversationCtrl', ['$scope', '$modal', 'Conversation', function($scope, $modal, Conversation) {
+
+  $scope.formData = { message: '' };
 
   $scope.getView = function() {
     return 'templates/conversation.html'
@@ -43,6 +45,18 @@ app.controller('SingleConversationCtrl', ['$scope', '$modal', function($scope, $
 
     modalInstance.result.then(updateUsers);
   };
+
+  $scope.postMessage = function(message) {
+    Conversation.postMessage({ id: $scope.conversation.uuid, text: message },
+      function(conversation) {
+        $scope.conversation.messages = conversation.messages;
+        $scope.formData.message = '';
+      },
+      function(err) {
+        console.log(err);
+      }
+    );
+  }
 
 }]);
 

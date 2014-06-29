@@ -23,6 +23,7 @@
         <span class="badge">{{c.messages.length}}</span>
       </a>
     </div>
+    <alert type="info" ng-show="user.conversations.length == 0">You have no conversations</alert>
   </div>
   <div id="conversation-container" class="col-xs-12 col-md-8 col-lg-9" ng-controller="SingleConversationCtrl" ng-include="getView()"></div>
 </div>
