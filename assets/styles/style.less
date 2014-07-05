@@ -28,8 +28,10 @@ body {
 
   #conversations-list {
     z-index: 999;
+    .bg-primary;
     h5 {
-      .bg-primary;
+      .bg-info;
+      color: @alert-info-text;
       padding: 12px;
     }
   }
@@ -99,6 +101,11 @@ body {
       }
     }
     #conversation-input {
+      .checkbox {
+        margin: 0px;
+        float: right;
+        padding-right: 10px;
+      }
       textarea {
         min-width: 100%;
         .success-border;
@@ -135,6 +142,24 @@ body {
   .btn-content {
     padding-top: 5px;
     float: left;
+  }
+}
+
+#loading-view {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+  background: fadeOut(black, 70%);
+  color: fadeOut(@gray-lighter, 10%);
+  z-index: 9999;
+  font-size: 80px;
+  display: block;
+  & > div {
+    margin: 180px auto;
+    display: block;
+    width: 80px;
   }
 }
 

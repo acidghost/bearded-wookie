@@ -4,12 +4,37 @@
 
 var app = angular.module('beardedWookie');
 
-app.controller('ConversationsCtrl', ['$scope', 'conv', 'Conversation', function($scope, conv, Conversation) {
+app.controller('ConversationsCtrl', ['$scope', 'conv', 'conversations', 'Conversation', 'socket', function($scope, conv, conversations, Conversation, socket) {
 
   $scope.isListCollapsed = false;
   $scope.user = $scope.loggedUser();
+  $scope.user.conversations = conversations;
   $scope.conversation = conv;
   $scope.conversationSelected = conv != null;
+
+  $scope.setUser($scope.user);
+
+  var conversationUpdate = function(data) {
+    console.log(data);
+    switch(data.attribute) {
+      case 'users':
+        break;
+      case 'messages':
+        socket.get('/api/conversation/'+data.id).success(
+          function(d) {
+            if($scope.conversationSelected && data.id == $scope.conversation.uuid) {
+              $scope.conversation = d;
+            }
+            var indexed = _.indexBy($scope.user.conversations, 'uuid');
+            $scope.user.conversations = _.map(indexed, function(element, key) {
+              return (key == data.id ? d : element);
+            });
+          }
+        );
+        break
+    }
+  };
+  socket.on('conversation', conversationUpdate);
 
   $scope.createConversation = function() {
     Conversation.create(null,

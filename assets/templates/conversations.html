@@ -20,7 +20,7 @@
          ng-class="{active: c.uuid == conversation.uuid}"
          ng-href="#/conversations/{{c.uuid}}">
         {{c.uuid}}
-        <span class="badge">{{c.messages.length}}</span>
+        <span class="label label-warning pull-right">{{c.messages.length}}</span>
       </a>
     </div>
     <alert type="info" ng-show="user.conversations.length == 0">You have no conversations</alert>

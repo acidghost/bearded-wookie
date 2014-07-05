@@ -28,8 +28,6 @@ var jsFilesToInject = [
   'js/dependencies/jquery.js',
   'js/dependencies/angular.js',
   'js/dependencies/ui-bootstrap.js',
-  'js/dependencies/socket*.js',
-  'js/dependencies/angular-sails.js',
   'js/dependencies/**/*.js',
 
   // All of the rest of your client-side js files

@@ -1,6 +1,24 @@
 <div class="row" ng-show="conversationSelected">
   <div class="col-xs-12">
     <div class="row">
+      <div class="col-xs-12 col-sm-6">
+        <div id="conversation-details">
+          <div><b>Created at:</b> <time><small>{{conversation.createdAt | date:'MM/dd/yyyy @ h:mma'}}</small></time></div>
+          <div><b>Updated at:</b> <time><small>{{conversation.updatedAt | date:'MM/dd/yyyy @ h:mma'}}</small></time></div>
+        </div>
+      </div>
+      <div class="col-xs-12 col-sm-6">
+        <div id="users-list">
+          <h6><span class="glyphicon glyphicon-user"></span> Users list</h6>
+          <ul class="list-inline">
+            <li ng-repeat="u in conversation.users">
+              {{u.uuid}} <span ng-show="u.uuid == user.uuid">(you)</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="row">
       <div class="col-xs-12">
         <div class="btn-toolbar pull-right" role="toolbar">
           <div class="btn-group btn-group-xs">
@@ -23,24 +41,6 @@
               <span class="glyphicon glyphicon-remove"></span>
             </a>
           </div>
-        </div>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-xs-12 col-sm-6">
-        <div id="conversation-details">
-          <div><b>Created at:</b> <time><small>{{conversation.createdAt | date:'MM/dd/yyyy @ h:mma'}}</small></time></div>
-          <div><b>Updated at:</b> <time><small>{{conversation.updatedAt | date:'MM/dd/yyyy @ h:mma'}}</small></time></div>
-        </div>
-      </div>
-      <div class="col-xs-12 col-sm-6">
-        <div id="users-list">
-          <h6><span class="glyphicon glyphicon-user"></span> Users list</h6>
-          <ul class="list-inline">
-            <li ng-repeat="u in conversation.users">
-              {{u.uuid}} <span ng-show="u.uuid == user.uuid">(you)</span>
-            </li>
-          </ul>
         </div>
       </div>
     </div>
@@ -68,6 +68,16 @@
       </div>
       <div id="conversation-input">
         <form name="sendMessageForm" ng-submit="postMessage(formData.message)">
+          <div class="row">
+            <div class="col-xs-12">
+              <div class="checkbox">
+                <label>
+                  <input type="checkbox" ng-model="formData.autoScroll">
+                  Auto-scroll
+                </label>
+              </div>
+            </div>
+          </div>
           <div class="row">
             <div class="col-xs-8 col-sm-9">
               <textarea ng-model="formData.message" required placeholder="Type your message..."></textarea>

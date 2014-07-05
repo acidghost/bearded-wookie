@@ -24,7 +24,11 @@ app.factory('Auth', ['Base64', 'SessionStorage', '$http', function(Base64, Sessi
       SessionStorage.put('user', JSON.stringify(user));
     },
     loggedUser: function() {
-      return JSON.parse(SessionStorage.get('user'));
+      var obj = JSON.parse(SessionStorage.get('user'));
+      if(obj) {
+        obj.authString = 'Basic ' + SessionStorage.get('authdata');
+      }
+      return obj;
     }
   };
 

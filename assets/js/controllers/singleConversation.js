@@ -6,7 +6,7 @@ var app = angular.module('beardedWookie');
 
 app.controller('SingleConversationCtrl', ['$scope', '$modal', 'Conversation', function($scope, $modal, Conversation) {
 
-  $scope.formData = { message: '' };
+  $scope.formData = { message: '', autoScroll: true };
 
   $scope.getView = function() {
     return 'templates/conversation.html'
@@ -15,6 +15,15 @@ app.controller('SingleConversationCtrl', ['$scope', '$modal', 'Conversation', fu
   var updateUsers = function(users) {
     $scope.$emit('usersChangedInConversation', users);
   };
+
+  $scope.$watch('conversation.messages', function() {
+    if($scope.formData.autoScroll) {
+      var tray = jQuery('#conversation-tray')[0];
+      if(tray != undefined) {
+        jQuery(tray).animate({ scrollTop: tray.scrollHeight}, 1000);
+      }
+    }
+  });
 
   $scope.addUser = function() {
     var modalInstance = $modal.open({
@@ -56,7 +65,7 @@ app.controller('SingleConversationCtrl', ['$scope', '$modal', 'Conversation', fu
         console.log(err);
       }
     );
-  }
+  };
 
 }]);
 

@@ -20,7 +20,7 @@
     "angular-route": "~1.2.18",
     "angular-resource": "~1.2.18",
     "angular-bootstrap": "~0.11.0",
-    "angular-sails": "~1.0.4",
-    "socket.io-client": "~1.0.6"
+    "sails.io.js": "~0.10.1",
+    "underscore": "~1.6.0"
   }
 }

@@ -31,6 +31,7 @@ var findOne = function findOne(req, res) {
       ErrorResolver(err, res);
     } else {
       if(results.map) {
+        Conversation.subscribe(req, results.conversation.uuid);
         return res.json(results.map);
       } else {
         return res.notFound();
@@ -60,19 +61,24 @@ module.exports = {
   },
 
   find: function(req, res) {
-    User
-      .findOne({ uuid: req.user.uuid })
-      .populate('conversations')
-      .exec(function(err, user) {
+    Conversation
+      .find()
+      .populate('messages')
+      .populate('users')
+      .exec(function(err, conversations) {
         if(err) {
           ErrorResolver(err, res);
         } else {
-          if(user) {
-            sails.log.debug('Returning conversations list to user', user.uuid);
-            res.ok(user.conversations);
-          } else {
-            res.forbidden();
+          // TODO: resolve this by trying to use populate() with criteria
+          var convs = [];
+          for(var i=0; i<conversations.length; i++) {
+            if(_.findWhere(conversations[i].users, { id: req.user.id })) {
+              convs.push(conversations[i]);
+            }
           }
+          Conversation.subscribe(req, Object.keys(_.indexBy(convs, 'uuid')));
+          sails.log.debug('Returning conversations list to user', req.user.uuid);
+          res.ok(convs);
         }
       });
   },
@@ -136,14 +142,14 @@ module.exports = {
               ErrorResolver(err, res);
             } else {
               if(user) {
-                var entityID = null;
+                var entity = null;
                 if(relation === 'users') {
                   for(var i=0; i<user.conversations.length; i++) {
                     if(user.conversations[i].uuid === conversation.uuid) {
                       return res.badRequest({ error: 'The user is already into the conversation' });
                     }
                   }
-                  entityID = user.uuid;
+                  entity = user;
                   conversation.users.add(user.id);
                 } else if(relation === 'messages') {
                   Message.create(
@@ -157,7 +163,7 @@ module.exports = {
                         return ErrorResolver(err, res);
                       } else {
                         sails.log.debug('Created new message:', JSON.stringify(message));
-                        entityID = message.uuid;
+                        entity = message;
                         conversation.messages.add(message.id);
                       }
                     });
@@ -166,8 +172,9 @@ module.exports = {
                   if(err) {
                     ErrorResolver(err, res);
                   } else {
-                    sails.log.debug('Added', relation, entityID, 'to conversation', conversation.uuid);
+                    sails.log.debug('Added', relation, entity.uuid || entity.id, 'to conversation', conversation.uuid);
                     //res.ok(c);
+                    Conversation.publishAdd(conversation.uuid, relation, entity.uuid);
                     findOne(req, res);
                   }
                 });
