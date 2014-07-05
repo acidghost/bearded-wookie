@@ -18,8 +18,8 @@ app.config(['$routeProvider', '$locationProvider', function ($routeProvider, $lo
         conv: function() {
           return null;
         },
-        conversations: ['Conversation', function(Conversation) {
-          return Conversation.getAll({id: '', entity: ''}).$promise;
+        conversations: ['socket', function(socket) {
+          return socket.get('/api/conversation');
         }]
       }
     })
@@ -30,8 +30,8 @@ app.config(['$routeProvider', '$locationProvider', function ($routeProvider, $lo
         conv: ['$route', 'socket', function($route, socket) {
           return socket.get('/api/conversation/'+$route.current.params.id);
         }],
-        conversations: ['Conversation', function(Conversation) {
-          return Conversation.getAll({id: '', entity: ''}).$promise;
+        conversations: ['socket', function(socket) {
+          return socket.get('/api/conversation');
         }]
       }
     })

@@ -4,7 +4,7 @@
 
 var app = angular.module('beardedWookie');
 
-app.controller('ConversationsCtrl', ['$scope', 'conv', 'conversations', 'Conversation', 'socket', function($scope, conv, conversations, Conversation, socket) {
+app.controller('ConversationsCtrl', ['$scope', 'conv', 'conversations', 'Conversation', 'socket', 'sound', function($scope, conv, conversations, Conversation, socket, sound) {
 
   $scope.isListCollapsed = false;
   $scope.user = $scope.loggedUser();
@@ -16,22 +16,21 @@ app.controller('ConversationsCtrl', ['$scope', 'conv', 'conversations', 'Convers
 
   var conversationUpdate = function(data) {
     console.log(data);
-    switch(data.attribute) {
-      case 'users':
-        break;
-      case 'messages':
-        socket.get('/api/conversation/'+data.id).success(
-          function(d) {
-            if($scope.conversationSelected && data.id == $scope.conversation.uuid) {
-              $scope.conversation = d;
-            }
-            var indexed = _.indexBy($scope.user.conversations, 'uuid');
-            $scope.user.conversations = _.map(indexed, function(element, key) {
-              return (key == data.id ? d : element);
-            });
+    if (data.attribute === 'users') {
+    } else if (data.attribute === 'messages') {
+      socket.get('/api/conversation/' + data.id).success(
+        function (d) {
+          if ($scope.conversationSelected && data.id == $scope.conversation.uuid) {
+            $scope.conversation = d;
+          } else if (data.verb == 'addedTo') {
+            sound.newMessage();
           }
-        );
-        break
+          var indexed = _.indexBy($scope.user.conversations, 'uuid');
+          $scope.user.conversations = _.map(indexed, function (element, key) {
+            return (key == data.id ? d : element);
+          });
+        }
+      );
     }
   };
   socket.on('conversation', conversationUpdate);

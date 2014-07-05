@@ -31,7 +31,7 @@ var findOne = function findOne(req, res) {
       ErrorResolver(err, res);
     } else {
       if(results.map) {
-        Conversation.subscribe(req, results.conversation.uuid);
+        //Conversation.subscribe(req, results.conversation.uuid);
         return res.json(results.map);
       } else {
         return res.notFound();
@@ -76,7 +76,13 @@ module.exports = {
               convs.push(conversations[i]);
             }
           }
-          Conversation.subscribe(req, Object.keys(_.indexBy(convs, 'uuid')));
+          if(req.isSocket) {
+            _.each(convs, function(c) {
+              if(Conversation.subscribers(c.uuid).indexOf(req.socket.id) == -1) {
+                Conversation.subscribe(req, c.uuid);
+              }
+            });
+          }
           sails.log.debug('Returning conversations list to user', req.user.uuid);
           res.ok(convs);
         }
